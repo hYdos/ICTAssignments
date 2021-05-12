@@ -1,11 +1,12 @@
 #![allow(unused_variables)]
+
 /**
     A quick web gl version of a vulkan render engine i wrote in kotlin.
     probably wont be a like what so ever but ill just use the name
     because im not that creative :)
 */
 
-use js_sys::{Boolean, JsString};
+use js_sys::{Array, Boolean, Float32Array, JsString};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
@@ -16,17 +17,18 @@ mod utils;
 
 #[wasm_bindgen]
 struct WebRosella {
-    is_ready: bool,
     vertex_shader: Option<WebGlShader>,
     fragment_shader: Option<WebGlShader>,
     program: Option<WebGlProgram>,
+    gl: WebGlRenderingContext,
 }
 
 #[wasm_bindgen]
 impl WebRosella {
     pub fn new(canvas_id: JsString) -> WebRosella {
-        log(canvas_id.to_rust_string().as_str());
-        let gl: WebGlRenderingContext = get_gl(canvas_id.to_rust_string().as_str()).unwrap();
+        let canvas_name = canvas_id.to_rust_string();
+        log("Starting WebRosella instance");
+        let gl: WebGlRenderingContext = get_gl(canvas_name.as_str()).unwrap();
 
         let vert_shader = compile_shader(
             &gl,
@@ -48,24 +50,35 @@ impl WebRosella {
     "#,
         );
         let program = link_program(&gl, &vert_shader.unwrap(), &frag_shader.unwrap());
-        gl.use_program(Some(&program.unwrap()));
 
-        let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+        return WebRosella {
+            vertex_shader: Option::None,
+            fragment_shader: Option::None,
+            program: Option::Some(program.unwrap()),
+            gl,
+        };
+    }
+
+    pub fn bind_vertices(&self, vertices: &Float32Array) {
+        let gl = &self.gl;
 
         let buffer = gl.create_buffer().ok_or("failed to create buffer");
         gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer.unwrap()));
 
-        // after `Float32Array::view` we have to be very careful not to
-        // do any memory allocations before it's dropped.
         unsafe {
-            let vert_array = js_sys::Float32Array::view(&vertices);
-
             gl.buffer_data_with_array_buffer_view(
                 WebGlRenderingContext::ARRAY_BUFFER,
-                &vert_array,
+                &vertices,
                 WebGlRenderingContext::STATIC_DRAW,
             );
         }
+    }
+
+    pub fn render(&self, vertices: &Float32Array) {
+        let gl: &WebGlRenderingContext = &self.gl;
+        gl.use_program(Some(&self.program.as_ref().unwrap()));
+
+        self.bind_vertices(vertices);
 
         gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
         gl.enable_vertex_attrib_array(0);
@@ -76,25 +89,13 @@ impl WebRosella {
         gl.draw_arrays(
             WebGlRenderingContext::TRIANGLES,
             0,
-            (vertices.len() / 3) as i32,
+            (vertices.length() / 3) as i32,
         );
-
-        return WebRosella {
-            is_ready: false,
-            vertex_shader: Option::None,
-            fragment_shader: Option::None,
-            program: Option::None
-        }
     }
 
-    pub fn render(self) {
-    }
+    pub fn add_vertices(self) {}
 
-    pub fn add_vertices(self) {
-    }
-
-    pub fn load_shader(self) {
-    }
+    pub fn load_shader(self) {}
 }
 
 #[wasm_bindgen(start)]

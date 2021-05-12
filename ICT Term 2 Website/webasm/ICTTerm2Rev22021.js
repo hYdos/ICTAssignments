@@ -177,6 +177,14 @@ function debugString(val) {
     // TODO we could test for more things here, like `Set`s and `Map`s.
     return className;
 }
+
+let stack_pointer = 32;
+
+function addBorrowedObject(obj) {
+    if (stack_pointer == 1) throw new Error('out of js stack');
+    heap[--stack_pointer] = obj;
+    return stack_pointer;
+}
 /**
 */
 export function main() {
@@ -221,10 +229,24 @@ export class WebRosella {
         return WebRosella.__wrap(ret);
     }
     /**
+    * @param {Float32Array} vertices
     */
-    render() {
-        const ptr = this.__destroy_into_raw();
-        wasm.webrosella_render(ptr);
+    bind_vertices(vertices) {
+        try {
+            wasm.webrosella_bind_vertices(this.ptr, addBorrowedObject(vertices));
+        } finally {
+            heap[stack_pointer++] = undefined;
+        }
+    }
+    /**
+    * @param {Float32Array} vertices
+    */
+    render(vertices) {
+        try {
+            wasm.webrosella_render(this.ptr, addBorrowedObject(vertices));
+        } finally {
+            heap[stack_pointer++] = undefined;
+        }
     }
     /**
     */
@@ -427,13 +449,9 @@ async function init(input) {
         var ret = getObject(arg0) === undefined;
         return ret;
     };
-    imports.wbg.__wbg_buffer_9e184d6f785de5ed = function(arg0) {
-        var ret = getObject(arg0).buffer;
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_newwithbyteoffsetandlength_abfc24c57fd08e6d = function(arg0, arg1, arg2) {
-        var ret = new Float32Array(getObject(arg0), arg1 >>> 0, arg2 >>> 0);
-        return addHeapObject(ret);
+    imports.wbg.__wbg_length_523cf4a01041a7a6 = function(arg0) {
+        var ret = getObject(arg0).length;
+        return ret;
     };
     imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
         var ret = getObject(arg0);
@@ -461,10 +479,6 @@ async function init(input) {
     };
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
-    };
-    imports.wbg.__wbindgen_memory = function() {
-        var ret = wasm.memory;
-        return addHeapObject(ret);
     };
 
     if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
