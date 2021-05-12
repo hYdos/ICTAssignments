@@ -11,11 +11,11 @@ mod utils;
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
     set_panic_hook();
-    log("");
+    log("Crab");
 
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
+    let canvas: web_sys::HtmlCan-vasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
 
     let gl = canvas
         .get_context("webgl")?
