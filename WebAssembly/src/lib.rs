@@ -1,5 +1,11 @@
 #![allow(unused_variables)]
+/**
+    A quick web gl version of a vulkan render engine i wrote in kotlin.
+    probably wont be a like what so ever but ill just use the name
+    because im not that creative :)
+*/
 
+use js_sys::{Boolean, JsString};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
@@ -8,80 +14,96 @@ use crate::utils::{*};
 
 mod utils;
 
-#[wasm_bindgen(start)]
-pub fn main() -> Result<(), JsValue> {
-    set_panic_hook();
-    log("Crab");
+#[wasm_bindgen]
+struct WebRosella {
+    is_ready: bool,
+    vertex_shader: Option<WebGlShader>,
+    fragment_shader: Option<WebGlShader>,
+    program: Option<WebGlProgram>,
+}
 
-    let document = web_sys::window().unwrap().document().unwrap();
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCan-vasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
+#[wasm_bindgen]
+impl WebRosella {
+    pub fn new(canvas_id: JsString) -> WebRosella {
+        log(canvas_id.to_rust_string().as_str());
+        let gl: WebGlRenderingContext = get_gl(canvas_id.to_rust_string().as_str()).unwrap();
 
-    let gl = canvas
-        .get_context("webgl")?
-        .unwrap()
-        .dyn_into::<WebGlRenderingContext>()?;
-
-    let vert_shader = compile_shader(
-        &gl,
-        WebGlRenderingContext::VERTEX_SHADER,
-        r#"
+        let vert_shader = compile_shader(
+            &gl,
+            WebGlRenderingContext::VERTEX_SHADER,
+            r#"
         attribute vec4 position;
         void main() {
             gl_Position = position;
         }
     "#,
-    )?;
-    let frag_shader = compile_shader(
-        &gl,
-        WebGlRenderingContext::FRAGMENT_SHADER,
-        r#"
+        );
+        let frag_shader = compile_shader(
+            &gl,
+            WebGlRenderingContext::FRAGMENT_SHADER,
+            r#"
         void main() {
             gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
         }
     "#,
-    )?;
-    let program = link_program(&gl, &vert_shader, &frag_shader)?;
-    gl.use_program(Some(&program));
-
-    let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
-
-    let buffer = gl.create_buffer().ok_or("failed to create buffer")?;
-    gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
-
-    // Note that `Float32Array::view` is somewhat dangerous (hence the
-    // `unsafe`!). This is creating a raw view into our module's
-    // `WebAssembly.Memory` buffer, but if we allocate more pages for ourself
-    // (aka do a memory allocation in Rust) it'll cause the buffer to change,
-    // causing the `Float32Array` to be invalid.
-    //
-    // As a result, after `Float32Array::view` we have to be very careful not to
-    // do any memory allocations before it's dropped.
-    unsafe {
-        let vert_array = js_sys::Float32Array::view(&vertices);
-
-        gl.buffer_data_with_array_buffer_view(
-            WebGlRenderingContext::ARRAY_BUFFER,
-            &vert_array,
-            WebGlRenderingContext::STATIC_DRAW,
         );
+        let program = link_program(&gl, &vert_shader.unwrap(), &frag_shader.unwrap());
+        gl.use_program(Some(&program.unwrap()));
+
+        let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+
+        let buffer = gl.create_buffer().ok_or("failed to create buffer");
+        gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer.unwrap()));
+
+        // after `Float32Array::view` we have to be very careful not to
+        // do any memory allocations before it's dropped.
+        unsafe {
+            let vert_array = js_sys::Float32Array::view(&vertices);
+
+            gl.buffer_data_with_array_buffer_view(
+                WebGlRenderingContext::ARRAY_BUFFER,
+                &vert_array,
+                WebGlRenderingContext::STATIC_DRAW,
+            );
+        }
+
+        gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+        gl.enable_vertex_attrib_array(0);
+
+        gl.clear_color(0.0, 0.0, 0.0, 1.0);
+        gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+
+        gl.draw_arrays(
+            WebGlRenderingContext::TRIANGLES,
+            0,
+            (vertices.len() / 3) as i32,
+        );
+
+        return WebRosella {
+            is_ready: false,
+            vertex_shader: Option::None,
+            fragment_shader: Option::None,
+            program: Option::None
+        }
     }
 
-    gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-    gl.enable_vertex_attrib_array(0);
+    pub fn render(self) {
+    }
 
-    gl.clear_color(0.0, 0.0, 0.0, 1.0);
-    gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+    pub fn add_vertices(self) {
+    }
 
-    gl.draw_arrays(
-        WebGlRenderingContext::TRIANGLES,
-        0,
-        (vertices.len() / 3) as i32,
-    );
+    pub fn load_shader(self) {
+    }
+}
+
+#[wasm_bindgen(start)]
+pub fn main() -> Result<(), JsValue> {
+    set_panic_hook();
     Ok(())
 }
 
-pub fn compile_shader(
+fn compile_shader(
     context: &WebGlRenderingContext,
     shader_type: u32,
     source: &str,
@@ -95,8 +117,7 @@ pub fn compile_shader(
     if context
         .get_shader_parameter(&shader, WebGlRenderingContext::COMPILE_STATUS)
         .as_bool()
-        .unwrap_or(false)
-    {
+        .unwrap_or(false) {
         Ok(shader)
     } else {
         Err(context
@@ -105,7 +126,7 @@ pub fn compile_shader(
     }
 }
 
-pub fn link_program(
+fn link_program(
     context: &WebGlRenderingContext,
     vert_shader: &WebGlShader,
     frag_shader: &WebGlShader,
@@ -121,8 +142,7 @@ pub fn link_program(
     if context
         .get_program_parameter(&program, WebGlRenderingContext::LINK_STATUS)
         .as_bool()
-        .unwrap_or(false)
-    {
+        .unwrap_or(false) {
         Ok(program)
     } else {
         Err(context

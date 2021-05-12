@@ -8,7 +8,7 @@
     <canvas id="canvas" width="640" height="480"></canvas>
     <script type="module" src="webasm/ICTTerm2Rev22021.js"></script>
     <script type="module">
-        import init, {main} from './webasm/ICTTerm2Rev22021.js';
+        import init, {main, WebRosella} from './webasm/ICTTerm2Rev22021.js';
 
         /**
          * Used to call the web Assembly used in this project.
@@ -17,6 +17,8 @@
         async function run() {
             await init();
             main();
+
+            const engine = WebRosella.new("canvas");
         }
         run();
     </script>
