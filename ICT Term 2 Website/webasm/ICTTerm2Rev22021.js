@@ -249,16 +249,13 @@ export class WebRosella {
         }
     }
     /**
+    * @param {string} vertexShader
+    * @param {string} fragmentShader
+    * @returns {WebRosella}
     */
-    add_vertices() {
-        const ptr = this.__destroy_into_raw();
-        wasm.webrosella_add_vertices(ptr);
-    }
-    /**
-    */
-    load_shader() {
-        const ptr = this.__destroy_into_raw();
-        wasm.webrosella_load_shader(ptr);
+    load_shader(vertexShader, fragmentShader) {
+        var ret = wasm.webrosella_load_shader(this.ptr, addHeapObject(vertexShader), addHeapObject(fragmentShader));
+        return WebRosella.__wrap(ret);
     }
 }
 
@@ -323,14 +320,6 @@ async function init(input) {
             wasm.__wbindgen_free(arg0, arg1);
         }
     };
-    imports.wbg.__wbg_getElementById_b180ea4ada06a837 = function(arg0, arg1, arg2) {
-        var ret = getObject(arg0).getElementById(getStringFromWasm0(arg1, arg2));
-        return isLikeNone(ret) ? 0 : addHeapObject(ret);
-    };
-    imports.wbg.__wbg_instanceof_Window_11e25482011fc506 = function(arg0) {
-        var ret = getObject(arg0) instanceof Window;
-        return ret;
-    };
     imports.wbg.__wbg_instanceof_HtmlCanvasElement_fd3cbbe3906d7792 = function(arg0) {
         var ret = getObject(arg0) instanceof HTMLCanvasElement;
         return ret;
@@ -339,6 +328,14 @@ async function init(input) {
         var ret = getObject(arg0).getContext(getStringFromWasm0(arg1, arg2));
         return isLikeNone(ret) ? 0 : addHeapObject(ret);
     }, arguments) };
+    imports.wbg.__wbg_instanceof_Window_11e25482011fc506 = function(arg0) {
+        var ret = getObject(arg0) instanceof Window;
+        return ret;
+    };
+    imports.wbg.__wbg_document_5aff8cd83ef968f5 = function(arg0) {
+        var ret = getObject(arg0).document;
+        return isLikeNone(ret) ? 0 : addHeapObject(ret);
+    };
     imports.wbg.__wbg_instanceof_WebGlRenderingContext_c86a7d34366b6a22 = function(arg0) {
         var ret = getObject(arg0) instanceof WebGLRenderingContext;
         return ret;
@@ -413,8 +410,8 @@ async function init(input) {
     imports.wbg.__wbg_vertexAttribPointer_d00262e9bf7a3742 = function(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
         getObject(arg0).vertexAttribPointer(arg1 >>> 0, arg2, arg3 >>> 0, arg4 !== 0, arg5, arg6);
     };
-    imports.wbg.__wbg_document_5aff8cd83ef968f5 = function(arg0) {
-        var ret = getObject(arg0).document;
+    imports.wbg.__wbg_getElementById_b180ea4ada06a837 = function(arg0, arg1, arg2) {
+        var ret = getObject(arg0).getElementById(getStringFromWasm0(arg1, arg2));
         return isLikeNone(ret) ? 0 : addHeapObject(ret);
     };
     imports.wbg.__wbindgen_string_new = function(arg0, arg1) {

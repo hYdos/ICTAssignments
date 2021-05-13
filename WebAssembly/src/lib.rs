@@ -23,6 +23,7 @@ struct WebRosella {
     gl: WebGlRenderingContext,
 }
 
+
 #[wasm_bindgen]
 impl WebRosella {
     pub fn new(canvas_id: JsString) -> WebRosella {
@@ -30,31 +31,10 @@ impl WebRosella {
         log("Starting WebRosella instance");
         let gl: WebGlRenderingContext = get_gl(canvas_name.as_str()).unwrap();
 
-        let vert_shader = compile_shader(
-            &gl,
-            WebGlRenderingContext::VERTEX_SHADER,
-            r#"
-        attribute vec4 position;
-        void main() {
-            gl_Position = position;
-        }
-    "#,
-        );
-        let frag_shader = compile_shader(
-            &gl,
-            WebGlRenderingContext::FRAGMENT_SHADER,
-            r#"
-        void main() {
-            gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
-        }
-    "#,
-        );
-        let program = link_program(&gl, &vert_shader.unwrap(), &frag_shader.unwrap());
-
         return WebRosella {
             vertex_shader: Option::None,
             fragment_shader: Option::None,
-            program: Option::Some(program.unwrap()),
+            program: Option::None,
             gl,
         };
     }
@@ -93,9 +73,28 @@ impl WebRosella {
         );
     }
 
-    pub fn add_vertices(self) {}
+    pub fn load_shader(&self, vertexShader: JsString, fragmentShader: JsString) -> WebRosella{
+        let gl: WebGlRenderingContext = get_gl("canvas").unwrap(); // TODO: fix
 
-    pub fn load_shader(self) {}
+        let vert_shader = compile_shader(
+            &gl,
+            WebGlRenderingContext::VERTEX_SHADER,
+            vertexShader.to_rust_string().as_str(),
+        );
+        let frag_shader = compile_shader(
+            &gl,
+            WebGlRenderingContext::FRAGMENT_SHADER,
+            fragmentShader.to_rust_string().as_str(),
+        );
+        let program = link_program(&gl, &vert_shader.unwrap(), &frag_shader.unwrap());
+
+        return WebRosella {
+            vertex_shader: None,
+            fragment_shader: None,
+            program: Option::Some(program.unwrap()),
+            gl
+        }
+    }
 }
 
 #[wasm_bindgen(start)]

@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Client</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <canvas id="canvas" width="640" height="480"></canvas>
     <script type="module" src="webasm/ICTTerm2Rev22021.js"></script>
+    <script>
+        const canvas = document.getElementById("canvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    </script>
     <script type="module">
         import init, {main, WebRosella} from './webasm/ICTTerm2Rev22021.js';
 
@@ -18,14 +24,25 @@
             await init();
             main();
 
-            const engine = WebRosella.new("canvas");
+            let engine = WebRosella.new("canvas");
+            engine = engine.load_shader(
+                `
+                attribute vec4 position;
+                void main() {
+                    gl_Position = position;
+                }`,
+                `
+                void main() {
+                    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+                }`
+            )
             const vertices = new Float32Array([
-                -0.5,  0.5, 0.0,
-                0.5,  0.5, 0.0,
+                -0.5, 0.5, 0.0,
+                0.5, 0.5, 0.0,
                 -0.5, -0.5, 0.0,
 
-                0.5,  -0.5, 0.0,
-                -0.5,  -0.5, 0.0,
+                0.5, -0.5, 0.0,
+                -0.5, -0.5, 0.0,
                 0.5, 0.5, 0.0,
             ]);
             engine.render(vertices)
