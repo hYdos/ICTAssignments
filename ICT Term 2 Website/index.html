@@ -28,18 +28,16 @@
                                     <div class="text-center">
                                         <h4 class="text-dark mb-4">Login</h4>
                                     </div>
-                                    <form class="user">
-                                        <div class="mb-3"><input class="form-control" type="text"></div>
-                                        <div class="mb-3"><input class="form-control" type="text"></div>
-                                        <a class="btn btn-primary d-block btn-user w-100" role="button"
-                                           href="dashboard.php">Login</a>
+                                    <form class="user" action="dashboard.php" method="post">
+                                        <input type="hidden" name="actionType" value="LOGIN" />
+                                        <div class="mb-3"><input type="text" class="form-control" name="Username"/></div>
+                                        <div class="mb-3"><input type="text" class="form-control" name="Password"/></div>
+                                        <button type="submit" class="btn btn-primary d-block btn-user w-100" role="button">Login</button>
                                         <hr>
                                         <hr>
                                     </form>
-                                    <div class="text-center"><a class="small" href="forgot-password.html">Forgot
-                                        Password?</a></div>
                                     <div class="text-center"><a class="small" href="register.html">Create an
-                                        Account!</a></div>
+                                        Account</a></div>
                                 </div>
                             </div>
                         </div>

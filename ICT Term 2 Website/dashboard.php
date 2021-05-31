@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php
 function connectToDb() {
     $servername = "localhost";
@@ -28,8 +27,19 @@ $conn = connectToDb();
 $hvers5 = evaluateExpression($conn, "SELECT * FROM `Users` WHERE username=\"hvers5\"");
 $conn->close();
 
-echo $hvers5["password"]
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    switch ($_POST['actionType']) {
+        case "LOGIN":
+            echo "Crab";
+            break;
+
+        default:
+            die("You got here without logging in somehow (actionType = " . $_POST['actionType'] . ")");
+    }
+}
 ?>
+<!DOCTYPE html>
 <html lang="en-us">
 <head>
     <meta charset="utf-8">
