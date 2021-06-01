@@ -14,29 +14,74 @@ function connectToDb() {
     return $conn;
 }
 
-function evaluateExpression($conn, $expr) {
+function clearCookies() {
+    if (isset($_SERVER['HTTP_COOKIE'])) {
+        $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+        foreach($cookies as $cookie) {
+            $parts = explode('=', $cookie);
+            $name = trim($parts[0]);
+            setcookie($name, '', time()-1000);
+            setcookie($name, '', time()-1000, '/');
+        }
+    }
+}
+
+function setUsrCookie($cookieName, $cookieVal) {
+    setcookie($cookieName, $cookieVal, time() + (86400 * 30), "/"); // 30 Days should be short enough
+}
+
+function evalExpr($conn, $expr) {
     $sql = $expr;
     if ($result = $conn->query($sql)) {
-        return mysqli_fetch_assoc($result);
+        return @mysqli_fetch_assoc($result);
     } else {
         die("Error creating database: " . $conn->error);
     }
 }
 
-$conn = connectToDb();
-$hvers5 = evaluateExpression($conn, "SELECT * FROM `Users` WHERE username=\"hvers5\"");
-$conn->close();
+function login($username) {
+    // I Really should be hashing & salting passwords
+    // I should also filter the username and password to stop attacks on the DB
+    clearCookies();
+    clearCookies();
+    $conn = connectToDb();
+    $user = evalExpr($conn, "SELECT * FROM `Users` WHERE username=\"" . $username . "\"");
+    $conn->close();
 
+    setUsrCookie("firstName", $user["first_name"]);
+    setUsrCookie("lastName", $user["last_name"]);
+    setUsrCookie("email", $user["email"]);
+}
 
+session_start();
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     switch ($_POST['actionType']) {
         case "LOGIN":
-            echo "Crab";
+            login($_POST["user"]);
+            break;
+
+        case "REGISTER":
+            $firstName = $_POST['first_name'];
+            $lastName = $_POST['last_name'];
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+
+            $conn = connectToDb();
+            $registration = evalExpr(
+                $conn,
+                "INSERT INTO `hvers5_Daymap2`.`Users` (`username`, `password`, `email`, `first_name`, `last_name`, `timetable`, `indicators`) VALUES ('$firstName', '$password', '$email', '$firstName', '$lastName', '{}', '{}');"
+            );
+
+            login($firstName);
             break;
 
         default:
             die("You got here without logging in somehow (actionType = " . $_POST['actionType'] . ")");
     }
+}
+
+if (!isset($_COOKIE["firstName"])) {
+    die("Failed to set cookies during login");
 }
 ?>
 <!DOCTYPE html>
@@ -51,11 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body id="page-top">
     <div id="wrapper">
-        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion sidebar-gradient p-0">
             <div class="container-fluid d-flex flex-column p-0"><a
                         class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0"
                         href="#">
@@ -161,17 +207,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                 <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link"
                                                                            aria-expanded="false"
                                                                            data-bs-toggle="dropdown" href="#"><span
-                                                class="d-none d-lg-inline me-2 text-gray-600 small">Hayden Verschelden</span><img
+                                                class="d-none d-lg-inline me-2 text-gray-600 small"><?php echo $_COOKIE["firstName"] . " " . $_COOKIE["lastName"] ?></span><img
                                                 class="border rounded-circle img-profile"
-                                                src="assets/img/avatars/dog.jpeg"></a>
+                                                src="https://bellbirdparkssc.eq.daymap.net/DayMap/Images/profile-icon-grey.png"></a>
                                     <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a
                                                 class="dropdown-item" href="#"><i
                                                     class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile</a><a
                                                 class="dropdown-item" href="#"><i
-                                                    class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Settings</a><a
-                                                class="dropdown-item" href="#"><i
-                                                    class="fas fa-list fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Activity
-                                            log</a>
+                                                    class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Settings</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#"><i
                                                     class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout</a>
@@ -279,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/script.min.js"></script>
+    <script src="js/sidebar.min.js"></script>
 </body>
 
 </html>
