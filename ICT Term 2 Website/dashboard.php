@@ -57,12 +57,12 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     switch ($_POST['actionType']) {
         case "LOGIN":
-            login($_POST["user"]);
+            login(ucfirst($_POST["user"]));
             break;
 
         case "REGISTER":
-            $firstName = $_POST['first_name'];
-            $lastName = $_POST['last_name'];
+            $firstName = ucfirst($_POST['first_name']);
+            $lastName = ucfirst($_POST['last_name']);
             $email = $_POST['email'];
             $password = $_POST['password'];
 
