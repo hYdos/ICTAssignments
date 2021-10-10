@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Term 2 ICT Assignment.iml" filepath="$PROJECT_DIR$/Term 2 ICT Assignment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BootLoader/BootLoader.iml" filepath="$PROJECT_DIR$/BootLoader/BootLoader.iml" />
       <module fileurl="file://$PROJECT_DIR$/WebAssembly/WebAssembly.iml" filepath="$PROJECT_DIR$/WebAssembly/WebAssembly.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ICT Term 2 Website/Website.iml" filepath="$PROJECT_DIR$/ICT Term 2 Website/Website.iml" />
     </modules>
   </component>
 </project>

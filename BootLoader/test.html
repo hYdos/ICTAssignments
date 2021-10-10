@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <script type="module">
+        import * as wasm from "./wasm/NewIctStuff.js";
+
+        wasm.default().then(() => {
+            let engine = new wasm.TeamFourTrees(true);
+            engine.run(true)
+        });
+    </script>
+</body>
+</html>
