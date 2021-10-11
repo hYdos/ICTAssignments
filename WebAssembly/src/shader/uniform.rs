@@ -1,8 +1,13 @@
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram, WebGlUniformLocation};
 
-pub(crate) struct Uniform {
+pub struct Uniform {
     location: WebGlUniformLocation,
     name: String,
+}
+
+pub struct UnbakedUniform {
+    name: String,
+    location: WebGlUniformLocation,
 }
 
 impl Uniform {

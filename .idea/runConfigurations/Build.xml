@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Build" type="WasmPackCommandRunConfiguration" factoryName="wasm-pack" nameIsGenerated="true">
-    <option name="command" value="build --target web --out-dir ..\BootLoader\wasm" />
+    <option name="command" value="build --target web --out-dir ../BootLoader/wasm" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$/WebAssembly" />
-    <option name="command" value="build --target web --out-dir ..\BootLoader\wasm" />
+    <option name="command" value="build --target web --out-dir ../BootLoader/wasm" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$/WebAssembly" />
     <method v="2">
       <option name="WASM_PACK.BUILD_TASK_PROVIDER" enabled="true" />

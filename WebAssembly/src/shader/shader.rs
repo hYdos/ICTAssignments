@@ -1,23 +1,12 @@
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
 use crate::shader::uniform::{Uniform};
 
-pub(crate) struct Shader {
+pub struct Shader {
     program: Option<WebGlProgram>,
-    uniforms: Vec<Uniform>
+    uniforms: Vec<Uniform>,
 }
 
 impl Shader {
-    pub(crate) fn bind(&self, gl: &WebGlRenderingContext) {
-        if let Some(program) = &self.program {
-            gl.use_program(Some(&program));
-        } else {
-            gl.use_program(None);
-        }
-    }
-}
-
-impl Shader {
-
     pub fn new(gl: &WebGlRenderingContext, vertex_shader: &str, fragment_shader: &str, uniforms: Vec<Uniform>) -> Shader {
         let vert_shader = compile_shader(
             gl,
@@ -33,7 +22,15 @@ impl Shader {
 
         Shader {
             program: Option::Some(program.unwrap()),
-            uniforms
+            uniforms,
+        }
+    }
+
+    pub fn bind(&self, gl: &WebGlRenderingContext) {
+        if let Some(program) = &self.program {
+            gl.use_program(Some(&program));
+        } else {
+            gl.use_program(None);
         }
     }
 }

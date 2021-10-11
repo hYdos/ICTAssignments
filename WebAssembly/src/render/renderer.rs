@@ -2,16 +2,16 @@ use std::rc::Rc;
 use crate::model::model::SimpleModel;
 use crate::shader::shader::Shader;
 use crate::utils::{get_gl, log};
-use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
+use web_sys::{HtmlCanvasElement, WebGlRenderingContext, WebGlShader, WebGlProgram};
 
 pub struct Renderer {
     pub gl: Rc<WebGlRenderingContext>,
 }
 
 impl Renderer {
-    pub fn new(canvas_id: &str) -> Renderer {
+    pub fn new(canvas: HtmlCanvasElement) -> Renderer {
         log("Its Rendering Time.");
-        let gl: WebGlRenderingContext = get_gl(canvas_id).unwrap();
+        let gl: WebGlRenderingContext = get_gl(canvas).unwrap();
 
         return Renderer {
             gl: Rc::new(gl),
@@ -36,5 +36,4 @@ impl Renderer {
             0,
         );
     }
-
 }

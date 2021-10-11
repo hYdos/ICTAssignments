@@ -11,18 +11,11 @@ pub fn get_document() -> Document {
     return web_sys::window().unwrap().document().unwrap();
 }
 
-pub fn get_gl(canvas: &str) -> Result<WebGlRenderingContext, JsValue> {
-    return Ok(get_canvas(canvas)?
+pub fn get_gl(canvas: HtmlCanvasElement) -> Result<WebGlRenderingContext, JsValue> {
+    return Ok(canvas
         .get_context("webgl")?
         .ok_or(JsValue::null())?
         .dyn_into::<WebGlRenderingContext>()?);
-}
-
-pub fn get_canvas(canvas: &str) -> Result<HtmlCanvasElement, JsValue> {
-    return Ok(get_document()
-        .get_element_by_id(canvas)
-        .ok_or(JsString::from("Canvas element not found"))?
-        .dyn_into::<web_sys::HtmlCanvasElement>()?);
 }
 
 pub trait JsStringExtensions {
