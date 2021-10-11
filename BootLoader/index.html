@@ -10,7 +10,7 @@
         import * as wasm from "./wasm/term_4_app_game.js";
 
         wasm.default().then(() => {
-            let engine = new wasm.TeamFourTrees(true);
+            let engine = new wasm.TeamFourTrees(true, document.getElementById("canvas"));
             engine.run(true)
         });
     </script>
