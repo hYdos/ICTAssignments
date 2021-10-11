@@ -1,5 +1,8 @@
 [package]
 name = "term_4_app_game"
+description = "An app/game based on a certian Capture the Flag game I play."
+license = "CC0 (Assets are ARR & Owned by Valve)"
+repository = "github.com/hYdos/ICTAssignments/"
 version = "0.0.1"
 authors = ["hYdos <haydenv06@gmail.com>"]
 edition = "2018"

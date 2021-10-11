@@ -1,5 +1,5 @@
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
-use crate::shader::uniform::{Uniform};
+use crate::shader::uniform::{UnbakedUniform, Uniform};
 
 pub struct Shader {
     program: Option<WebGlProgram>,
@@ -7,7 +7,7 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(gl: &WebGlRenderingContext, vertex_shader: &str, fragment_shader: &str, uniforms: Vec<Uniform>) -> Shader {
+    pub fn new(gl: &WebGlRenderingContext, vertex_shader: &str, fragment_shader: &str, uniforms: Vec<UnbakedUniform>) -> Shader {
         let vert_shader = compile_shader(
             gl,
             WebGlRenderingContext::VERTEX_SHADER,
