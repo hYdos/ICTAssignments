@@ -1,6 +1,6 @@
 [package]
-name = "NewIctStuff"
-version = "0.1.0"
+name = "term_4_app_game"
+version = "0.0.1"
 authors = ["hYdos <haydenv06@gmail.com>"]
 edition = "2018"
 
@@ -21,6 +21,7 @@ features = [
     'WebGlBuffer',
     'WebGlRenderingContext',
     'WebGlProgram',
+    'WebGlUniformLocation',
     'WebGlShader',
     'Window',
 ]

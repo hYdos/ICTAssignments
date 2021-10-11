@@ -1,6 +1,7 @@
 use crate::render::renderer::Renderer;
 use std::rc::Rc;
 use web_sys::{WebGlBuffer, WebGlRenderingContext};
+use crate::shader::shader::Shader;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vertex(pub f32, pub f32, pub f32);
@@ -10,17 +11,19 @@ pub struct SimpleModel {
     vertex_buffer: WebGlBuffer, // The models vertices
     index_buffer: WebGlBuffer, // The models indices
     index_count: usize,   // Amount of indices
-    gl: Rc<WebGlRenderingContext>,
+    shader: Shader, // The Shader to render with
+    gl: Rc<WebGlRenderingContext>, // Rendering Context
 }
 
 impl SimpleModel {
-    pub fn new(renderer: &Renderer, vertices: Vec<Vertex>, indices: Vec<u16>) -> SimpleModel {
+    pub fn new(renderer: &Renderer, vertices: Vec<Vertex>, indices: Vec<u16>, shader: Shader) -> SimpleModel {
         let gl = renderer.gl.clone();
         SimpleModel {
             vertex_fmt_size: 8, // 2 Floats (4 Bytes Each). Total of 8.
             vertex_buffer: create_vertex_buffer(&gl, &vertices),
             index_buffer: create_index_buffer(&gl, &indices),
             index_count: indices.len(),
+            shader,
             gl,
         }
     }
@@ -31,6 +34,7 @@ impl SimpleModel {
 
     /// Binds relevant data for rendering this Model
     pub fn bind(&mut self) {
+        self.shader.bind(self.gl.as_ref());
         bind_buffer(self.gl.as_ref(), &self.vertex_buffer);
         bind_element_buffer(self.gl.as_ref(), &self.index_buffer);
     }

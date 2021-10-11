@@ -1,14 +1,10 @@
 use std::rc::Rc;
-use crate::render::model::SimpleModel;
-use crate::render::shader::{compile_shader, link_program};
+use crate::model::model::SimpleModel;
+use crate::shader::shader::Shader;
 use crate::utils::{get_gl, log};
-use web_sys::WebGlProgram;
-use web_sys::{WebGlRenderingContext, WebGlShader};
+use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
 
 pub struct Renderer {
-    vertex_shader: Option<WebGlShader>,
-    fragment_shader: Option<WebGlShader>,
-    program: Option<WebGlProgram>,
     pub gl: Rc<WebGlRenderingContext>,
 }
 
@@ -18,21 +14,12 @@ impl Renderer {
         let gl: WebGlRenderingContext = get_gl(canvas_id).unwrap();
 
         return Renderer {
-            vertex_shader: Option::None,
-            fragment_shader: Option::None,
-            program: Option::None,
             gl: Rc::new(gl),
         };
     }
 
     pub fn render(&mut self, model: &mut SimpleModel) {
         let gl = &self.gl;
-
-        if let Some(program) = &self.program {
-            gl.use_program(Some(&program));
-        } else {
-            gl.use_program(None);
-        }
 
         model.bind();
 
@@ -50,19 +37,4 @@ impl Renderer {
         );
     }
 
-    pub fn load_shader(&mut self, vertex_shader: &str, fragment_shader: &str) {
-        let vert_shader = compile_shader(
-            &self.gl,
-            WebGlRenderingContext::VERTEX_SHADER,
-            vertex_shader,
-        );
-        let frag_shader = compile_shader(
-            &self.gl,
-            WebGlRenderingContext::FRAGMENT_SHADER,
-            fragment_shader,
-        );
-        let program = link_program(&self.gl, &vert_shader.unwrap(), &frag_shader.unwrap());
-
-        self.program = Option::Some(program.unwrap())
-    }
 }

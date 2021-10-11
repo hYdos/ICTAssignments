@@ -1,4 +1,8 @@
-attribute vec4 position;
+attribute vec3 inPos;
+
+uniform mat3 u_matrix;
+
 void main() {
-    gl_Position = position;
+    // Multiply the position by the matrix.
+    gl_Position = u_matrix * inPos;
 }

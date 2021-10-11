@@ -1,13 +1,15 @@
 #![allow(unused_variables)]
 
-use crate::render::model::{SimpleModel, Vertex};
+use crate::model::model::{SimpleModel, Vertex};
 use crate::render::renderer::Renderer;
 use wasm_bindgen::prelude::*;
 
 use crate::utils::*;
 
 mod render;
+mod model;
 pub mod utils;
+mod shader;
 
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
@@ -32,7 +34,7 @@ impl TeamFourTrees {
     #[wasm_bindgen]
     pub fn run(&mut self, tf2e: bool) {
         self.renderer.load_shader(
-            include_str!("shaders/simple.v.glsl"),
+            include_str!("shaders/simple2D.v.glsl"),
             include_str!("shaders/simple.f.glsl"),
         );
 
